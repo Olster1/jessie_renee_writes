@@ -31,7 +31,8 @@
         </form>
         </div>
       </div>
-      <div id="home-section"><p>"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"</p></div>
+      <div id="social-media"><a><img src=""/><<img src=""/></div>
+      <div id="home-section"></div>
 
   </div>
 <script>
@@ -80,7 +81,16 @@ window.onload = function() {
   }
   navBar.innerHTML = navLinkString;
 
-  
+  var socialMedia = [
+  {imageUrl: "twitter_logo.png", webUrl: "www.twitter.com"},
+  {imageUrl: "facebook_logo.png", webUrl: "www.facebook.com"},
+  {imageUrl: "instagram_logo.png", webUrl: "www.instagram.com"}
+  ];
+
+  var socialElm = document.getElementById("social-media");
+  for(var i = 0; i < socialMedia.length; ++i) {
+    socialMedia.innerHTML += "<a href='" + socialMedia[i].webUrl + "'><img src='" + socialMedia[i].imageUrl + "'/></a>";
+  }
 
 
   var MOVE_NULL  = 0; 
@@ -99,19 +109,90 @@ window.onload = function() {
   var LEFT_PERCENT = -1;
   var MIDDLE_PERCENT = 0;
   var RIGHT_PERCENT = 1.2;
-  var tPeriod = 3;
+
+  var animations = [];
+
+
   var carouselContent = [
-  {text: "The confines of their camp are all they’ve ever known. But a girl they call Mouse believes the rumours are true — liberation is coming.<br>Friends betray her, enemies become allies. And the refuge she seeks in White City might just be the most dangerous thing of all.<br><a href='./white_city'>Read More</a>", imageUrl: "white_city.png", t: 0, minValue: MIDDLE_PERCENT, maxValue: MIDDLE_PERCENT, updating: false},
-  {text: "Melodie receives an inheritance she never expected -- not just a haunted house, but a whole haunted town. Plus growing psychic abilities that tell her danger is coming. But what's the point of seeing the future, if you can't even protect the people you care about most?<br><a href='./hidden_bay'>Read More</a>", imageUrl: "HB_book_tablet.png", t: 0, minValue: LEFT_PERCENT, maxValue: LEFT_PERCENT, updating: false},
-  {text: "Melodie receives an inheritance she never expected -- not just a haunted house, but a whole haunted town. Plus growing psychic abilities that tell her danger is coming. But what's the point of seeing the future, if you can't even protect the people you care about most?<br><a href='./hidden_bay'>Read More</a>", imageUrl: "crossing_paths.png", t: 0, minValue: LEFT_PERCENT, maxValue: LEFT_PERCENT, updating: false}];
-  var carouselIndex = 0;
+  {text: "The confines of their camp are all they’ve ever known. But a girl they call Mouse believes the rumours are true — liberation is coming.<br>Friends betray her, enemies become allies. And the refuge she seeks in White City might just be the most dangerous thing of all.<br><a href='./white_city'>Read More</a>", imageUrl: "white_city.png"},
+  {text: "Melodie receives an inheritance she never expected -- not just a haunted house, but a whole haunted town. Plus growing psychic abilities that tell her danger is coming. But what's the point of seeing the future, if you can't even protect the people you care about most?<br><a href='./hidden_bay'>Read More</a>", imageUrl: "HB_book_tablet.png"},
+  {text: "It was foolish. Taking off her engagement ring for just one night. It wasn’t meant to become anything…</p><p>But now fate won’t let Ashley forget Ethan, even if she wanted to.</p><a href='./crossing_paths'>Read More</a>", imageUrl: "crossing_paths.png"}];
+
+
+  function addAnimation(tPeriod, objectToModify, variableName, type, callback) {
+  	var object = {tAt: 0, period: tPeriod, minValue: 0, maxValue: 0, object: objectToModify, variableName: "", callBack: callback, type: type, updating: false};
+  	var lengthOfArray = animations.push(object);
+  	return (lengthOfArray - 1);
+  }
+
+  function createCarouselItem(index, startX) {
+    var carElm = carouselContent[index];
+    //var startX = (carElm.minValue*100) + "%";
+    var styleString = "padding-right: 2%; padding-left: 2%; display: inline-block; width: 40%; vertical-align: top; ";
+
+    return "<span id='carousel" + index + "' style='text-align: center; position: absolute; display: inline-block; width: 100%; left: " + startX + "'><div style='" + styleString + "'>" + carElm.text + "</div>" + "<img style='height: 30vw; ' src='" + carElm.imageUrl + "'></span>";
+  }
+
+  var GlobalCarouselIndex = 0;
   var carousel = document.getElementById("book-carousel");
 
   var carouselHtmlString = "";  
   for(var i = 0; i < carouselContent.length; ++i) {
-    carouselHtmlString += createCarouselItem(i);
+    carouselHtmlString += createCarouselItem(i, 0);
   }
   carousel.innerHTML += carouselHtmlString;
+
+  for(var i = 0; i < carouselContent.length; ++i) {
+  	var thisCarousel = document.getElementById("carousel" + i)
+  	var tPeriod = 3.0;
+	addAnimation(tPeriod, thisCarousel.style, "left", "carousel", null);
+  }
+
+  function moveItemOn(moveDirection) {
+    autoChangeTimer = 0;
+
+    switch(moveDirection) {
+      case MOVE_LEFT: {
+        var car1 = animations[GlobalCarouselIndex]; //make this into an index array
+        var index1 = ((GlobalCarouselIndex - 1) >= 0) ? GlobalCarouselIndex - 1: carouselContent.length -1;
+        var car2 = animations[index1];
+          
+        if(!car1.updating && !car2.updating) {
+          car1.minValue = MIDDLE_PERCENT;
+          car1.maxValue = LEFT_PERCENT;
+          car1.updating = true;
+          
+          car2.minValue = RIGHT_PERCENT;
+          car2.maxValue = MIDDLE_PERCENT;
+          car2.updating = true;
+
+          GlobalCarouselIndex = index1;
+        }
+
+        break;
+      }
+      case MOVE_RIGHT: {
+        var car1 = animations[GlobalCarouselIndex];
+        var index1 = ((GlobalCarouselIndex + 1) < carouselContent.length) ? GlobalCarouselIndex + 1: 0;
+        var car2 = animations[index1];
+        
+        if(!car1.updating && !car2.updating) {
+          car1.minValue = MIDDLE_PERCENT;
+          car1.maxValue = RIGHT_PERCENT;
+          car1.updating = true;
+          
+          car2.minValue = LEFT_PERCENT;
+          car2.maxValue = MIDDLE_PERCENT;
+          car2.updating = true;
+
+          GlobalCarouselIndex = index1;
+        }
+        break;
+      }
+    }
+  }
+
+  //////////////////////
 
   var signupExit = document.getElementById("signup-form-exit-btn");
   signupExit.addEventListener("click", function(e) {
@@ -184,14 +265,7 @@ window.onload = function() {
   }
 
 
-  function createCarouselItem(index) {
-    var carElm = carouselContent[index];
-    var startX = (carElm.minValue*100) + "%";
-    var styleString = "padding-right: 2%; padding-left: 2%; display: inline-block; width: 40%; vertical-align: top; ";
 
-    return "<span id='carousel" + index + "' style='text-align: center; position: absolute; display: inline-block; width: 100%; left: " + startX + "'><div style='" + styleString + "'>" + carElm.text + "</div>" + "<img style='height: 30vw; ' src='" + carElm.imageUrl + "'></span>";
-
-  }
   var animationTime = 1.0/30.0;
 
   window.setTimeout(function(){ 
@@ -203,83 +277,64 @@ window.onload = function() {
     form_time = 0;
   }
 
-  function moveItemOn(moveDirection) {
-    autoChangeTimer = 0;
-
-    switch(moveDirection) {
-      case MOVE_LEFT: {
-        var car1 = carouselContent[carouselIndex];
-        var index1 = ((carouselIndex - 1) >= 0) ? carouselIndex - 1: carouselContent.length -1;
-        var car2 = carouselContent[index1];
-          
-        if(!car1.updating && !car2.updating) {
-          car1.minValue = MIDDLE_PERCENT;
-          car1.maxValue = LEFT_PERCENT;
-          car1.updating = true;
-          
-          car2.minValue = RIGHT_PERCENT;
-          car2.maxValue = MIDDLE_PERCENT;
-          car2.updating = true;
-
-          carouselIndex = index1;
-        }
-
-        break;
-      }
-      case MOVE_RIGHT: {
-        var car1 = carouselContent[carouselIndex];
-        var index1 = ((carouselIndex + 1) < carouselContent.length) ? carouselIndex + 1: 0;
-        var car2 = carouselContent[index1];
-        
-        if(!car1.updating && !car2.updating) {
-          car1.minValue = MIDDLE_PERCENT;
-          car1.maxValue = RIGHT_PERCENT;
-          car1.updating = true;
-          
-          car2.minValue = LEFT_PERCENT;
-          car2.maxValue = MIDDLE_PERCENT;
-          car2.updating = true;
-
-          carouselIndex = index1;
-        }
-        break;
-      }
-    }
-  }
+  
 
   function getPercentValueAt(minValue, t, maxValue, period) {
     return (100*lerp(minValue, tLinear_to_tSineous(t / period), maxValue)) + "%";
   }
 
-
-  function updateCarousel(index) {
-    var carElm = carouselContent[index];
-    if(carElm.updating) {
-      carElm.t += animationTime;
-      var thisCarousel = document.getElementById("carousel" + index);
-      thisCarousel.style.left = getPercentValueAt(carElm.minValue, carElm.t, carElm.maxValue, tPeriod);
-      if(carElm.t / tPeriod > 1) {
-        carElm.t = 0;
-        carElm.updating = false;
-      }
-    }
-    return carElm.updating;
-  }
+  
 
   var autoChangeTimer = 0;
   window.setInterval(function(){
+
     //NOTE(): This could be improved if we just put everyone in an animation object and just loop through array of animating objects!! - Ollie 7th Feb 2017
     //update carousel 
-    updateAutoTimer = true;  
-    for(var i = 0; i < carouselContent.length; i++) {
-      updateAutoTimer &= !(updateCarousel(i));
-    }  
-    if(updateAutoTimer) {
+    // updateAutoTimer = true;  
+    // for(var i = 0; i < carouselContent.length; i++) {
+    //   var carElm = carouselContent[index];
+    //       if(carElm.updating) {
+    //         carElm.t += animationTime;
+    //         var thisCarousel = document.getElementById("carousel" + index);
+    //         thisCarousel.style.left = getPercentValueAt(carElm.minValue, carElm.t, carElm.maxValue, tPeriod);
+            
+    //         if(carElm.t / tPeriod > 1) {
+    //           carElm.t = 0;
+    //           carElm.updating = false;
+    //         }
+    //       }
+    //       return carElm.updating;
+    // }  
+    
+
+    var updateCarousel = true;
+  	for(var i = 0; i < animations.length; ++i) {
+
+  		var anim = animations[i];
+  		console.log(anim.updating);
+  		if(anim.updating) {
+  			anim.tAt += animationTime;
+	  		anim.object[anim.variableName] = getPercentValueAt(anim.minValue, anim.tAt, anim.maxValue, anim.period);
+	  		if((anim.tAt / anim.period) > 1) {
+	  		    anim.tAt = 0;
+	  		    anim.updating = false;
+	  		    if(anim.callback) {
+	  		    	anim.callback();
+	  		    }
+	  		}
+	  	}
+	  	if(anim.type === "carousel") {
+	  		updateCarousel &= (!anim.updating);
+	  	}
+  	}
+
+  	if(updateCarousel) {
       autoChangeTimer += animationTime;  
       if(autoChangeTimer > 2) {
         moveItemOn(MOVE_RIGHT);
       }
     }
+
     //update form box
     if(currentFormMove === MOVE_DOWN) {
       var signupForm = document.getElementById("signup-form");
@@ -307,7 +362,6 @@ window.onload = function() {
       if(dropDownMenu_t / dropDownMenuPeriod > 1) {
           dropDownMenu_t = 0;
           if(currentDropDownState === MOVE_DOWN) {
-            console.log("hello");
             menu.style.display = "none";
           } 
           currentDropDownState = MOVE_NULL;

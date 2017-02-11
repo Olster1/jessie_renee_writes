@@ -108,8 +108,10 @@ a {
 		color: black;
 		transition: background-color 0.5s ease;
 	}
+	@define yellow_color #3300ff
+
 	.nav-link:hover {
-		background-color: #3300ff;
+		background-color: yellow_color;
 	}
 	#nav-bar {
 		padding-top: 5em;
