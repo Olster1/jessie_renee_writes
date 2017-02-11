@@ -15,8 +15,8 @@
       <div id="book-carousel">
         <div style="position: absolute; bottom: 5%; left: 80%; z-index: 1"><button id="left-scroll-btn"><span><</span></button><button id="right-scroll-btn"><span>></span></button></div>
       </div>
-      <div id="signup-form" style="display: none; position: fixed; bottom: -30%; width: 100%; background-color: purple; z-index: 2;">
-        <img src="clouds.png" style="position: absolute; height: auto; width: 100%; z-index: -1; bottom: -15em;"/>
+      <div id="signup-form" style="position: fixed; bottom: -30%; width: 100%; background-color: purple; z-index: 2;">
+        <!-- <img src="clouds.png" style="position: absolute; height: auto; width: 100%; z-index: -1; bottom: -15em;"/> -->
         <div style="text-align: center;">
         <button id="signup-form-exit-btn" style="position: absolute; font-size: 22pt; right: 0">X</button>
         <form action="http://www.sendy.edgeeffectmedia.com/subscribe" method="POST" accept-charset="utf-8">
@@ -31,7 +31,7 @@
         </form>
         </div>
       </div>
-      <div id="social-media"><a><img src=""/><<img src=""/></div>
+      <div id="social-media"></div>
       <div id="home-section"></div>
 
   </div>
@@ -77,7 +77,6 @@ window.onload = function() {
       }
       navLinkString += "</div>";
     } 
-    
   }
   navBar.innerHTML = navLinkString;
 
@@ -92,26 +91,22 @@ window.onload = function() {
     socialMedia.innerHTML += "<a href='" + socialMedia[i].webUrl + "'><img src='" + socialMedia[i].imageUrl + "'/></a>";
   }
 
-
-  var MOVE_NULL  = 0; 
   var MOVE_LEFT  = 1; 
   var MOVE_RIGHT = 2; 
   var MOVE_UP  = 3; 
   var MOVE_DOWN = 4; 
 
+  var SHOW = 0;
+  var HIDE = 1;
+
   var FORM_BOX_INVISIBLE = -0.3;
   var FORM_BOX_VISIBLE = 0;
-  var form_time = 0;
-  var form_period = 1;
-  var currentFormMove = MOVE_NULL
-
-
+  
   var LEFT_PERCENT = -1;
   var MIDDLE_PERCENT = 0;
   var RIGHT_PERCENT = 1.2;
 
   var animations = [];
-
 
   var carouselContent = [
   {text: "The confines of their camp are all they’ve ever known. But a girl they call Mouse believes the rumours are true — liberation is coming.<br>Friends betray her, enemies become allies. And the refuge she seeks in White City might just be the most dangerous thing of all.<br><a href='./white_city'>Read More</a>", imageUrl: "white_city.png"},
@@ -119,15 +114,15 @@ window.onload = function() {
   {text: "It was foolish. Taking off her engagement ring for just one night. It wasn’t meant to become anything…</p><p>But now fate won’t let Ashley forget Ethan, even if she wanted to.</p><a href='./crossing_paths'>Read More</a>", imageUrl: "crossing_paths.png"}];
 
 
-  function addAnimation(tPeriod, objectToModify, variableName, type, callback) {
-  	var object = {tAt: 0, period: tPeriod, minValue: 0, maxValue: 0, object: objectToModify, variableName: "", callBack: callback, type: type, updating: false};
+  function addAnimation(tPeriod, objectToModify, variableName, type, domObject) {
+  	var object = {tAt: 0, period: tPeriod, minValue: 0, maxValue: 0, object: objectToModify, variableName: variableName, callBack: null, type: type, domObject: domObject, updating: false};
   	var lengthOfArray = animations.push(object);
   	return (lengthOfArray - 1);
   }
 
-  function createCarouselItem(index, startX) {
+  function createCarouselItem(index, xPercent) {
     var carElm = carouselContent[index];
-    //var startX = (carElm.minValue*100) + "%";
+    var startX = (xPercent*100) + "%";
     var styleString = "padding-right: 2%; padding-left: 2%; display: inline-block; width: 40%; vertical-align: top; ";
 
     return "<span id='carousel" + index + "' style='text-align: center; position: absolute; display: inline-block; width: 100%; left: " + startX + "'><div style='" + styleString + "'>" + carElm.text + "</div>" + "<img style='height: 30vw; ' src='" + carElm.imageUrl + "'></span>";
@@ -136,17 +131,22 @@ window.onload = function() {
   var GlobalCarouselIndex = 0;
   var carousel = document.getElementById("book-carousel");
 
+  var Positions = [MIDDLE_PERCENT, LEFT_PERCENT, RIGHT_PERCENT];
   var carouselHtmlString = "";  
   for(var i = 0; i < carouselContent.length; ++i) {
-    carouselHtmlString += createCarouselItem(i, 0);
+    carouselHtmlString += createCarouselItem(i, Positions[i]);
   }
   carousel.innerHTML += carouselHtmlString;
 
   for(var i = 0; i < carouselContent.length; ++i) {
   	var thisCarousel = document.getElementById("carousel" + i)
   	var tPeriod = 3.0;
-	addAnimation(tPeriod, thisCarousel.style, "left", "carousel", null);
+	  addAnimation(tPeriod, thisCarousel.style, "left", "carousel", null, null);
   }
+
+  var FormIndex = addAnimation(3.0, document.getElementById("signup-form").style, "bottom", "", null);
+
+  var BookDropDownIndex = addAnimation(3.0, document.getElementById("drop-down-menu-Books").style, "height", "", document.getElementById("drop-down-menu-Books"));
 
   function moveItemOn(moveDirection) {
     autoChangeTimer = 0;
@@ -211,33 +211,28 @@ window.onload = function() {
 
   var isHovering0 = false;
   var isHovering1 = false;
-  var SHOW = 0;
-  var HIDE = 1;
+
 
   var booksNavItem = document.getElementById("nav-item-Books");
   booksNavItem.addEventListener("mouseover", function(e) {
-    toggleDropDownMenu("Books", SHOW);
+    toggleDropDownMenu(SHOW);
     isHovering0 = true;
   });
   booksNavItem.addEventListener("mouseout", function(e) {
     isHovering0 = false;
-    if(!isHovering0 && !isHovering1) toggleDropDownMenu("Books", HIDE);
+    if(!isHovering0 && !isHovering1) toggleDropDownMenu(HIDE);
   });
 
   var menuItem = document.getElementById("drop-down-menu-Books");
   menuItem.addEventListener("mouseover", function(e) {
     isHovering1 = true;
-    toggleDropDownMenu("Books", SHOW);
+    toggleDropDownMenu(SHOW);
   });
   menuItem.addEventListener("mouseout", function(e) {
     isHovering1 = false;
-    if(!isHovering0 && !isHovering1) toggleDropDownMenu("Books", HIDE);
+    if(!isHovering0 && !isHovering1) toggleDropDownMenu(HIDE);
   });
 
-  var dropDownMenu_t = 0;
-  var dropDownMenuPeriod = 3;
-  var currentDropDownState = MOVE_NULL;
-  var idName = "";
 
   function getOppositeState(state) {
     var res = MOVE_NULL;
@@ -249,22 +244,30 @@ window.onload = function() {
     return res;
   }
 
-  var showDropDownMenu = false;
-  function toggleDropDownMenu(name, state) {
-      idName = "drop-down-menu-" + name;
-      if(currentDropDownState !== MOVE_NULL && currentDropDownState !== getOppositeState(state)) {
-        dropDownMenu_t = 1.0 - dropDownMenu_t;
-        console.log("in");
-      }
-
+  function toggleDropDownMenu(state) {
+      // if(currentDropDownState !== MOVE_NULL && currentDropDownState !== getOppositeState(state)) {
+      //   dropDownMenu_t = 1.0 - dropDownMenu_t;
+      // }
+      var DropDownAnim = animations[BookDropDownIndex];
+      console.log(DropDownAnim);
+      DropDownAnim.domObject.style.display = "inline";
+      DropDownAnim.tAt = 0.0;
+      console.log(state);
       if(state === SHOW) {
-        currentDropDownState = MOVE_UP;
+        DropDownAnim.minValue = 0;
+        DropDownAnim.maxValue = 1;
       } else if(state === HIDE) {
-        currentDropDownState = MOVE_DOWN;
+        DropDownAnim.minValue = 1;
+        DropDownAnim.maxValue = 0;
       }
+
+      DropDownAnim.updating = true;
+      DropDownAnim.callBack = function() {
+        if(DropDownAnim.maxValue === 0) {
+            DropDownAnim.domObject.style.display = "none";
+          } 
+      };
   }
-
-
 
   var animationTime = 1.0/30.0;
 
@@ -273,45 +276,28 @@ window.onload = function() {
   }, 2000);
 
   function beginFormMove(move) {
-    currentFormMove = move;
-    form_time = 0;
+    var FormAnimation = animations[FormIndex];
+    FormAnimation.tAt = 0.0;
+    if(move === MOVE_DOWN) { 
+      FormAnimation.minValue = FORM_BOX_VISIBLE;
+      FormAnimation.maxValue = FORM_BOX_INVISIBLE;
+    } else if(move === MOVE_UP) {
+      FormAnimation.minValue = FORM_BOX_INVISIBLE;
+      FormAnimation.maxValue = FORM_BOX_VISIBLE;
+    }
+    FormAnimation.updating = true;
   }
-
-  
 
   function getPercentValueAt(minValue, t, maxValue, period) {
     return (100*lerp(minValue, tLinear_to_tSineous(t / period), maxValue)) + "%";
   }
 
-  
-
   var autoChangeTimer = 0;
   window.setInterval(function(){
-
-    //NOTE(): This could be improved if we just put everyone in an animation object and just loop through array of animating objects!! - Ollie 7th Feb 2017
-    //update carousel 
-    // updateAutoTimer = true;  
-    // for(var i = 0; i < carouselContent.length; i++) {
-    //   var carElm = carouselContent[index];
-    //       if(carElm.updating) {
-    //         carElm.t += animationTime;
-    //         var thisCarousel = document.getElementById("carousel" + index);
-    //         thisCarousel.style.left = getPercentValueAt(carElm.minValue, carElm.t, carElm.maxValue, tPeriod);
-            
-    //         if(carElm.t / tPeriod > 1) {
-    //           carElm.t = 0;
-    //           carElm.updating = false;
-    //         }
-    //       }
-    //       return carElm.updating;
-    // }  
-    
-
     var updateCarousel = true;
   	for(var i = 0; i < animations.length; ++i) {
 
   		var anim = animations[i];
-  		console.log(anim.updating);
   		if(anim.updating) {
   			anim.tAt += animationTime;
 	  		anim.object[anim.variableName] = getPercentValueAt(anim.minValue, anim.tAt, anim.maxValue, anim.period);
@@ -332,40 +318,6 @@ window.onload = function() {
       autoChangeTimer += animationTime;  
       if(autoChangeTimer > 2) {
         moveItemOn(MOVE_RIGHT);
-      }
-    }
-
-    //update form box
-    if(currentFormMove === MOVE_DOWN) {
-      var signupForm = document.getElementById("signup-form");
-      signupForm.style.bottom = getPercentValueAt(FORM_BOX_VISIBLE, form_time, FORM_BOX_INVISIBLE, form_period);
-    } else if(currentFormMove === MOVE_UP) {
-      var signupForm = document.getElementById("signup-form");
-      signupForm.style.bottom = getPercentValueAt(FORM_BOX_INVISIBLE, form_time, FORM_BOX_VISIBLE, form_period);
-    }
-    form_time += animationTime;
-    if(form_time / form_period > 1) {
-        form_time = 0;
-        currentFormMove = MOVE_NULL;
-    }
-    //update drop down menu
-    if(currentDropDownState !== MOVE_NULL) {
-      var menu = document.getElementById(idName);
-      if(currentDropDownState === MOVE_DOWN) {
-        menu.style.display = "inline";
-        menu.style.height = getPercentValueAt(1, dropDownMenu_t, 0, dropDownMenuPeriod);
-      } else if(currentDropDownState === MOVE_UP) {
-        menu.style.display = "inline";
-        menu.style.height = getPercentValueAt(0, dropDownMenu_t, 1, dropDownMenuPeriod);
-      }
-      dropDownMenu_t += animationTime;
-      if(dropDownMenu_t / dropDownMenuPeriod > 1) {
-          dropDownMenu_t = 0;
-          if(currentDropDownState === MOVE_DOWN) {
-            menu.style.display = "none";
-          } 
-          currentDropDownState = MOVE_NULL;
-          idName = "";
       }
     }
   }, animationTime*1000); 
