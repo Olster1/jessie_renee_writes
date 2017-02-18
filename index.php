@@ -1,3 +1,38 @@
+<?php
+  $db_file = fopen("posts.txt", "r") or die("unable to open file");
+
+  $posts = "[";
+  $currentString = "";
+  $lineNum = 0;
+  while(!feof($db_file)) {
+    $line = fgets($db_file);
+    if(strlen($line) >= 2 && $line[0] == '/' && $line[1] == '/') {
+      if(strlen($currentString) > 0) {
+        $posts .= $currentString . "\"}, ";  
+        $lineNum = 0;
+        $currentString = "";
+      }
+    } else {
+      $toAdd = substr($line, 0, (strlen($line) - 2));
+      if($lineNum == 0) {
+          $currentString .= "{date: \"" . $toAdd . "<br>\", ";
+        } else if($lineNum == 1) {
+          $currentString .= "title: \"" . $toAdd . "<br>\", ";
+        } else if ($lineNum == 2){
+          $currentString .= "text: \"" . $toAdd;  
+        } else {
+          $currentString .= $toAdd;  
+        }
+
+      $lineNum++;
+      
+    }
+  }
+  
+  $posts .= "]";
+  fclose($db_file);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -15,23 +50,29 @@
       <div id="book-carousel">
         <div style="position: absolute; bottom: 5%; left: 80%; z-index: 1"><button id="left-scroll-btn"><span><</span></button><button id="right-scroll-btn"><span>></span></button></div>
       </div>
-      <div id="signup-form" style="position: fixed; bottom: -30%; width: 100%; background-color: purple; z-index: 2;">
-        <!-- <img src="clouds.png" style="position: absolute; height: auto; width: 100%; z-index: -1; bottom: -15em;"/> -->
-        <div style="text-align: center;">
-        <button id="signup-form-exit-btn" style="position: absolute; font-size: 22pt; right: 0">X</button>
+      <div id="signup-form" style="position: fixed; width: 30em; bottom: -100em;">
+        <img src="Pop up.png" style="position: absolute; width: 100%; z-index: 0;"/>
+        <div style="text-align: left; display: inline-block; position: relative; top: 3em; left: 14em; width: 50%; font-family: 'Raleway', sans-serif; color: white;">
+        <button id="signup-form-exit-btn" style="position: absolute; border-radius: 1em; padding-left: 0.2em; padding-right: 0.2em; font-size: 14pt; background-color: gray; border: none; top: -0.8em; color: black; right: -0.8em;">X</button>
         <form action="http://www.sendy.edgeeffectmedia.com/subscribe" method="POST" accept-charset="utf-8">
-          <label for="name">Name</label><br/>
-          <input type="text" name="name" id="name"/>
+          <p style="line-height: 130%;">Signup to get exclusive updates & read Ghost Storm for FREE</p>
+          <span style="line-height: 300%">
+          <label for="name"><b>Name</b></label>
+          <input style="position: relative; background-color: gray; color: white; border: none; padding-left: 0.5em; padding-right: 0.5em; right: 0;" type="text" name="name" id="name"/>
           <br/>
-          <label for="email">Email</label><br/>
-          <input type="email" name="email" id="email"/>
+          <label for="email"><b>Email</b></label>
+          <input style="position: relative; background-color: gray; color: white; border: none; padding-left: 0.5em; padding-right: 0.5em; left: 0.3em;" type="email" name="email" id="email"/>
           <br/>
           <input type="hidden" name="list" value="PsWbB1YsrVSedE6TE9jD8w"/>
-          <input type="submit" name="submit" id="submit"/>
+          <div style="text-align: center"><input style="border: none; background-color: white; padding-left: 0.5em; padding-right: 0.5em; font-weight: bold;" type="submit" name="submit" value="Get my Free Book" id="submit"/></div>
+          
+          </span>
         </form>
+        
         </div>
       </div>
-      <div id="social-media"></div>
+      <div id="social-media" style="text-align: center;"></div>
+      <div id="blog-posts" style="display: inline-block; width: 45%; vertical-align: top"></div><!-- LightWidget WIDGET --><script src="//lightwidget.com/widgets/lightwidget.js"></script><iframe src="//lightwidget.com/widgets/c0b9af16f9a35017819997a7a7cee54c.html" scrolling="no" allowtransparency="true" class="lightwidget-widget" style="width: 100%; border: 0; overflow: hidden; width: 45%;"></iframe>
       <div id="home-section"></div>
 
   </div>
@@ -81,15 +122,23 @@ window.onload = function() {
   navBar.innerHTML = navLinkString;
 
   var socialMedia = [
-  {imageUrl: "twitter_logo.png", webUrl: "www.twitter.com"},
-  {imageUrl: "facebook_logo.png", webUrl: "www.facebook.com"},
-  {imageUrl: "instagram_logo.png", webUrl: "www.instagram.com"}
+  {imageUrl: "facebook_logo.png", webUrl: "http://www.facebook.com/jessiereneewrites"},
+  {imageUrl: "instagram_logo.png", webUrl: "http://www.instagram.com/jessiereneewrites"},
+  {imageUrl: "youtube_logo.png", webUrl: "https://www.youtube.com/channel/UCqnBnPEtOjDtOBb_fxrmi4w"},
+  {imageUrl: "pinterest_logo.png", webUrl: "http://www.pinterest.com/jessieandco"}
   ];
 
   var socialElm = document.getElementById("social-media");
   for(var i = 0; i < socialMedia.length; ++i) {
-    socialMedia.innerHTML += "<a href='" + socialMedia[i].webUrl + "'><img src='" + socialMedia[i].imageUrl + "'/></a>";
+    socialElm.innerHTML += "<a href='" + socialMedia[i].webUrl + "'><img style='width: 5%; padding: 5%;' src='" + socialMedia[i].imageUrl + "'/></a>";
   }
+
+  var blogPosts = <?php echo $posts; ?>;
+
+  var blogElm = document.getElementById("blog-posts");
+  for(var i = 0; i < blogPosts.length; ++i) {
+    blogElm.innerHTML += "<div style='padding: 2%;'>" + blogPosts[i].date + "<a href='./blog/" + blogPosts[i].title + "'>" + blogPosts[i].title + "</a>" + blogPosts[i].text + "</div>";
+  }  
 
   var MOVE_LEFT  = 1; 
   var MOVE_RIGHT = 2; 
@@ -100,7 +149,7 @@ window.onload = function() {
   var HIDE = 1;
 
   var FORM_BOX_INVISIBLE = -0.3;
-  var FORM_BOX_VISIBLE = 0;
+  var FORM_BOX_VISIBLE = 0.16;
   
   var LEFT_PERCENT = -1;
   var MIDDLE_PERCENT = 0;
@@ -123,9 +172,9 @@ window.onload = function() {
   function createCarouselItem(index, xPercent) {
     var carElm = carouselContent[index];
     var startX = (xPercent*100) + "%";
-    var styleString = "padding-right: 2%; padding-left: 2%; display: inline-block; width: 40%; vertical-align: top; ";
+    var styleString = "position: relative; padding-right: 2%; padding-left: 2%; display: inline-block; width: 40%; vertical-align: top; top: 5vw; text-align: left; font-size: 1.8vw; line-height: 100%;";
 
-    return "<span id='carousel" + index + "' style='text-align: center; position: absolute; display: inline-block; width: 100%; left: " + startX + "'><div style='" + styleString + "'>" + carElm.text + "</div>" + "<img style='height: 30vw; ' src='" + carElm.imageUrl + "'></span>";
+    return "<span id='carousel" + index + "' style='text-align: center; position: absolute;display: inline-block; width: 100%; left: " + startX + "'><div style='" + styleString + "'>" + carElm.text + "</div>" + "<img style='height: 30vw; ' src='" + carElm.imageUrl + "'></span>";
   }
 
   var GlobalCarouselIndex = 0;
@@ -144,7 +193,8 @@ window.onload = function() {
 	  addAnimation(tPeriod, thisCarousel.style, "left", "carousel", null, null);
   }
 
-  var FormIndex = addAnimation(3.0, document.getElementById("signup-form").style, "bottom", "", null);
+//TODO: make a spot to put second parameter in addAnimation()
+  var FormIndex = addAnimation(0.4, document.getElementById("signup-form").style, "bottom", "", null);
 
   var BookDropDownIndex = addAnimation(3.0, document.getElementById("drop-down-menu-Books").style, "height", "", document.getElementById("drop-down-menu-Books"));
 
