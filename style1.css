@@ -1,0 +1,207 @@
+* {
+	margin: 0;
+	padding: 0;
+	line-height: 1.5em;
+	text-decoration: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+}
+
+.indie-flower-font {
+  	font-family: 'Indie Flower', cursive;
+  	font-size: 1em;
+  	line-height: 2.0em;
+  	color: black;
+}
+
+.lato-font {
+	font-family: 'Lato', sans-serif;
+	font-size: 1em;
+  	line-height: 2.0em;
+  	color: black;
+}
+#signup-form {
+	/*background-image: url("clouds.png");*/
+}
+
+#signup-form-exit-btn {
+	position: absolute; 
+	border-radius: 0.4em; 
+	padding: 0.2em; 
+	right: 0; 
+	font-size: 14pt; 
+	background-color: gray; 
+	border: none; 
+	top: -0.8em; 
+	color: black;
+}
+
+#signup-form-exit-btn:hover {
+		background-color: white;
+
+
+}
+
+.scroll-btn {
+	/*background-color: lightgray;*/
+	color: white;
+	background-color: rgba(0, 0, 0, 0);
+	border: none;/*0.1em solid black;*/
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	font-size: 2vw;
+	/*font-weight: bold;*/
+}
+
+.scroll-btn:hover {
+		background-color: white;
+}
+
+.large-font-size {
+	font-size: 2em;
+}
+
+#background-image {
+  	min-width: 920px;	  
+
+	width: 100%;
+	max-width: 100%;
+	height: auto;
+	position: absolute;
+	overflow: hidden;
+
+	z-index: -2;
+
+}
+
+a {
+	color: black;
+}
+
+.carousel-btn {
+	font-color: white; 
+	font-size: 22pt;
+	position: absolute;
+	right: 5%;
+	background-color: rgba(255, 255, 255, 0.4);
+
+}
+
+.signup-form-field {
+	position: relative; 	
+	background-color: gray; 	
+	color: white; 
+	border: none; 
+	padding-left: 0.5em; 
+	padding-right: 0.5em; 
+	right: 0;
+
+}
+
+.nav-link {
+	padding: 1%;
+	display: inline;
+	
+	transition: color 0.5s ease;
+	color: white;
+	
+}
+
+.nav-link:hover {
+	color: purple;
+}
+
+#nav-bar {
+	font-size: 14pt;
+	font-family: 'Raleway', sans-serif;
+	z-index: 1; 
+	position: relative; 
+	padding-top: 3%; 
+	width: 100%;
+	left: 60%;
+	overflow: visible;
+
+}
+.drop-down-menu {
+	position: absolute; 
+	top: 100%; 
+	/*left: 5%;*/
+	overflow: hidden;
+	background-color: rgba(255, 255, 255, 0.2); 
+	color: black;
+	visibility: hidden;
+	height: 0;
+	font-size: 12pt;
+}
+
+.burger-btn {
+	display: inline;
+	position: absolute;
+	background-color: rgba(0, 0, 0, 0);
+	color: white;
+	padding: 0.2em;
+	border-radius: 0.1em;
+	top: 0.7em;
+	border: none;
+	right: 0.7em;
+	font-size: 22pt;
+}
+
+.drop-down-menu-btn {
+	display: inline; 
+	position: absolute; 
+	background-color: none; 
+	border: none; 
+	right: 20%; 
+	z-index: 3;
+	vertical-align: top;
+
+}
+
+#book-carousel {
+	color: black;
+	position: relative; 
+	height: 50vw; 
+	width: 100%; 
+	text-align: center;
+	padding-top: 5%;
+	color: white;
+	font-size: 2vw;
+	font-family: 'Raleway', sans-serif;
+	overflow: !important hidden; 
+}
+
+@media screen and (max-width: 920px) { 
+	.nav-link {
+		padding: 0;
+		display: block;
+		color: black;
+		transition: background-color 0.5s ease;
+		background-color: rgba(255, 255, 255, 0.4);
+
+	}
+	.nav-link:hover {
+		background-color: rgba(255, 255, 255, 0.8);
+	}
+	#nav-bar {
+		padding-top: 5em;
+		text-align: center;
+		left: auto;
+		height: 0;
+
+	}
+	.drop-down-menu {
+		font-size: 12pt;
+
+	}
+
+	#book-carousel {
+		padding-top: 2em;
+	}
+
+}
